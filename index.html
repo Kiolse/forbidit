@@ -81,9 +81,7 @@
 
         .upload-icon {
             font-size: 48px;
-            /* background: var(--primary-gradient); */
             -webkit-background-clip: text;
-            /* -webkit-text-fill-color: transparent; */
             margin-bottom: 10px;
         }
 
@@ -275,10 +273,13 @@
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
 
+        let originalImage = null;
+
         function handleImage(file) {
             const reader = new FileReader();
             reader.onload = function (e) {
-                updateProcessedPreview(e.target.result);
+                originalImage = e.target.result;
+                updateProcessedPreview(originalImage);
                 preview.style.display = 'block';
                 optionsGroup.style.display = 'block';
                 uploadArea.style.display = 'none';
@@ -315,6 +316,15 @@
                 ctx.clip();
 
                 ctx.drawImage(img, startX, startY, drawWidth, drawHeight);
+
+                // Convert to black and white
+                const imageData = ctx.getImageData(0, 0, size, size);
+                const data = imageData.data;
+                for (let i = 0; i < data.length; i += 4) {
+                    const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+                    data[i] = data[i + 1] = data[i + 2] = avg;
+                }
+                ctx.putImageData(imageData, 0, 0);
 
                 const watermark = new Image();
                 watermark.onload = function () {
@@ -427,6 +437,15 @@
 
                 ctx.drawImage(img, startX, startY, drawWidth, drawHeight);
 
+                // Convert to black and white
+                const imageData = ctx.getImageData(0, 0, size, size);
+                const data = imageData.data;
+                for (let i = 0; i < data.length; i += 4) {
+                    const avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+                    data[i] = data[i + 1] = data[i + 2] = avg;
+                }
+                ctx.putImageData(imageData, 0, 0);
+
                 const watermark = new Image();
                 watermark.onload = function () {
                     ctx.drawImage(watermark, 0, 0, size, size);
@@ -435,12 +454,12 @@
 
                     const link = document.createElement('a');
                     link.download = 'forbidden_image.png';
-                    link.href = canvas.toDataURL();
+                    link.href = canvas.toDataURL('image/png');
                     link.click();
                 };
                 watermark.src = 'forbid.svg';
             };
-            img.src = processedPreview.src;
+            img.src = originalImage; // Use the original image for better quality
         }
     </script>
 </body>

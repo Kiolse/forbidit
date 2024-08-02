@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forbid It</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #ff4b2b, #ff416c);
+            --secondary-color: #666;
+            --background-color: #f5f5f5;
+            --card-background: #ffffff;
+            --text-color: #333;
+            --border-radius: 8px;
+            --transition: all 0.3s ease;
+            --button-height: 44px;
+            --button-radius: calc(var(--button-height) / 2);
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--background-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--text-color);
+        }
+
+        .container {
+            max-width: 480px;
+            width: 100%;
+            background: var(--card-background);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            transition: var(--transition);
+        }
+
+        .container:hover {
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--secondary-color);
+            margin-bottom: 30px;
+            font-size: 16px;
+            font-weight: 100;
+        }
+
+        .upload-area {
+            border: 1px dashed #ccc;
+            border-radius: var(--border-radius);
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            border-style: dashed;
+            border-width: 1px;
+            border-spacing: 5px;
+        }
+
+        .upload-area:hover {
+            background-color: rgba(0, 0, 0, 0.03);
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            /* background: var(--primary-gradient); */
+            -webkit-background-clip: text;
+            /* -webkit-text-fill-color: transparent; */
+            margin-bottom: 10px;
+        }
+
+        .upload-text {
+            color: var(--text-color);
+            font-size: 16px;
+            font-weight: 100;
+        }
+
+        #imageInput {
+            display: none;
+        }
+
+        #preview {
+            text-align: center;
+            margin-top: 30px;
+            display: none;
+            border: 1px dashed #ccc;
+            border-radius: var(--border-radius);
+            padding: 30px;
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        #processedPreview {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 50%;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin: 10px;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        button {
+            flex: 1;
+            padding: 0 20px;
+            border: none;
+            border-radius: var(--button-radius);
+            font-size: 16px;
+            transition: var(--transition);
+            cursor: pointer;
+            font-weight: 300;
+            position: relative;
+            margin: 0 5px;
+            height: var(--button-height);
+            line-height: var(--button-height);
+        }
+
+        #exportBtn {
+            background: var(--primary-gradient);
+            color: white;
+            position: relative;
+        }
+
+        #exportBtn:hover {
+            opacity: 0.9;
+        }
+
+        #changeImageBtn {
+            background: linear-gradient(135deg, rgba(255, 75, 43, 0.1), rgba(255, 65, 108, 0.1));
+            color: #ff416c;
+        }
+
+        #changeImageBtn:hover {
+            background: linear-gradient(135deg, rgba(255, 75, 43, 0.2), rgba(255, 65, 108, 0.2));
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #95a5a6;
+            font-size: 14px;
+            font-weight: 100;
+        }
+
+        #optionsGroup {
+            display: none;
+        }
+
+        canvas {
+            display: none;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .dropdown {
+            display: none;
+            position: absolute;
+            background-color: #fff;
+            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+            border-radius: var(--button-radius);
+            overflow: hidden;
+            top: calc(100% + 5px);
+            right: 0;
+            left: 0;
+        }
+
+        .dropdown a {
+            color: var(--text-color);
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            transition: var(--transition);
+            font-weight: 300;
+            font-size: 14px;
+        }
+
+        .dropdown a:hover {
+            background: linear-gradient(135deg, rgba(255, 75, 43, 0.1), rgba(255, 65, 108, 0.1));
+        }
+
+        .inspiration {
+            text-align: center;
+            margin-top: 20px;
+            font-style: italic;
+            color: var(--secondary-color);
+            font-weight: 100;
+            font-size: 12px;
+        }
+
+        @media (max-width: 640px) {
+            .button-group {
+                flex-direction: column;
+            }
+
+            .button-group button {
+                margin: 5px 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Forbid It</h1>
+        <div class="subtitle">If you don't like it, forbid it</div>
+        <div class="upload-area" id="uploadArea">
+            <div class="upload-icon">📁</div>
+            <div class="upload-text">Click, drag image here to upload, or paste from clipboard</div>
+        </div>
+        <input type="file" id="imageInput" accept="image/*">
+        <div id="preview">
+            <img id="processedPreview" src="" alt="Processed Image Preview">
+        </div>
+        <canvas id="canvas"></canvas>
+        <div id="optionsGroup" class="fade-in">
+            <div class="button-group">
+                <button id="changeImageBtn">Change Image</button>
+                <button id="exportBtn">
+                    Forbid It
+                    <div class="dropdown">
+                        <a href="#" data-size="1024">Large (1024x1024)</a>
+                        <a href="#" data-size="512">Medium (512x512)</a>
+                        <a href="#" data-size="256">Small (256x256)</a>
+                    </div>
+                </button>
+            </div>
+        </div>
+        <div class="footer">© 2024 Forbid It Tool</div>
+        <div class="inspiration">Inspired by Guangzhou Metro</div>
+    </div>
+
+    <script>
+        const uploadArea = document.getElementById('uploadArea');
+        const imageInput = document.getElementById('imageInput');
+        const preview = document.getElementById('preview');
+        const processedPreview = document.getElementById('processedPreview');
+        const optionsGroup = document.getElementById('optionsGroup');
+        const changeImageBtn = document.getElementById('changeImageBtn');
+        const exportBtn = document.getElementById('exportBtn');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        function handleImage(file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                updateProcessedPreview(e.target.result);
+                preview.style.display = 'block';
+                optionsGroup.style.display = 'block';
+                uploadArea.style.display = 'none';
+            }
+            reader.readAsDataURL(file);
+        }
+
+        function updateProcessedPreview(imageSrc) {
+            const size = 200;
+            canvas.width = size;
+            canvas.height = size;
+
+            const img = new Image();
+            img.onload = function () {
+                const aspectRatio = img.width / img.height;
+                let drawWidth, drawHeight, startX, startY;
+
+                if (aspectRatio > 1) {
+                    drawHeight = size;
+                    drawWidth = size * aspectRatio;
+                    startX = (size - drawWidth) / 2;
+                    startY = 0;
+                } else {
+                    drawWidth = size;
+                    drawHeight = size / aspectRatio;
+                    startX = 0;
+                    startY = (size - drawHeight) / 2;
+                }
+
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2, true);
+                ctx.closePath();
+                ctx.clip();
+
+                ctx.drawImage(img, startX, startY, drawWidth, drawHeight);
+
+                const watermark = new Image();
+                watermark.onload = function () {
+                    ctx.drawImage(watermark, 0, 0, size, size);
+                    processedPreview.src = canvas.toDataURL();
+                };
+                watermark.src = 'forbid.svg';
+
+                ctx.restore();
+            };
+            img.src = imageSrc;
+        }
+
+        uploadArea.addEventListener('click', () => imageInput.click());
+
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.style.backgroundColor = 'rgba(0, 0, 0, 0.1)';
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.style.backgroundColor = '';
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.style.backgroundColor = '';
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                handleImage(file);
+            }
+        });
+
+        imageInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                handleImage(file);
+            }
+        });
+
+        changeImageBtn.addEventListener('click', () => {
+            preview.style.display = 'none';
+            optionsGroup.style.display = 'none';
+            uploadArea.style.display = 'block';
+            imageInput.value = '';
+        });
+
+        document.addEventListener('paste', (e) => {
+            const items = e.clipboardData.items;
+            for (let i = 0; i < items.length; i++) {
+                if (items[i].type.indexOf('image') !== -1) {
+                    const file = items[i].getAsFile();
+                    handleImage(file);
+                    break;
+                }
+            }
+        });
+
+        let isDropdownVisible = false;
+
+        exportBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            isDropdownVisible = !isDropdownVisible;
+            exportBtn.querySelector('.dropdown').style.display = isDropdownVisible ? 'block' : 'none';
+        });
+
+        document.addEventListener('click', () => {
+            if (isDropdownVisible) {
+                exportBtn.querySelector('.dropdown').style.display = 'none';
+                isDropdownVisible = false;
+            }
+        });
+
+        exportBtn.querySelector('.dropdown').addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (e.target.tagName === 'A') {
+                const size = parseInt(e.target.getAttribute('data-size'));
+                generateImage(size);
+                isDropdownVisible = false;
+                exportBtn.querySelector('.dropdown').style.display = 'none';
+            }
+        });
+
+        function generateImage(size) {
+            canvas.width = size;
+            canvas.height = size;
+
+            const img = new Image();
+            img.onload = function () {
+                const aspectRatio = img.width / img.height;
+                let drawWidth, drawHeight, startX, startY;
+
+                if (aspectRatio > 1) {
+                    drawHeight = size;
+                    drawWidth = size * aspectRatio;
+                    startX = (size - drawWidth) / 2;
+                    startY = 0;
+                } else {
+                    drawWidth = size;
+                    drawHeight = size / aspectRatio;
+                    startX = 0;
+                    startY = (size - drawHeight) / 2;
+                }
+
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2, true);
+                ctx.closePath();
+                ctx.clip();
+
+                ctx.drawImage(img, startX, startY, drawWidth, drawHeight);
+
+                const watermark = new Image();
+                watermark.onload = function () {
+                    ctx.drawImage(watermark, 0, 0, size, size);
+
+                    ctx.restore();
+
+                    const link = document.createElement('a');
+                    link.download = 'forbidden_image.png';
+                    link.href = canvas.toDataURL();
+                    link.click();
+                };
+                watermark.src = 'forbid.svg';
+            };
+            img.src = processedPreview.src;
+        }
+    </script>
+</body>
+
+</html>
